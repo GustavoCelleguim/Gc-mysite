@@ -1,6 +1,6 @@
 import { useEffect, useState, memo } from 'react'
-import { Routes, Route, Link } from 'react-router-dom'
-import { ArrowRight, ExternalLink, Mail, MessageSquare, Github, Zap, Shield, Globe, Layers, Clock as ClockIcon, Calendar, BookOpen, Sun, Moon } from 'lucide-react'
+import { Routes, Route, Link, useLocation } from 'react-router-dom'
+import { ArrowRight, MessageCircle,ExternalLink, Mail, MessageSquare, Github, Zap, Shield, Globe, Layers, Clock as ClockIcon, Calendar, BookOpen, Sun, Moon } from 'lucide-react'
 import { I18N } from './constants/i18n'
 import './App.css'
 import minhaFoto from './assets/minhafoto.png'
@@ -8,8 +8,10 @@ import minhaFoto from './assets/minhafoto.png'
 
 // Import pages
 import AboutPage from './pages/abount'
-import ArticlesPage from './pages/articles'
+import ArticlesPage, { ArticleDetail } from './pages/articles'
 import ProjectsPage from './pages/projects'
+import InteractiveBackground from './components/InteractiveBackground'
+import WorkspacePage from './pages/Workspace'
 
 // Contribution heatmap data (generated once, stable across renders)
 const contributions: number[][] = Array.from({ length: 53 }, () =>
@@ -66,6 +68,8 @@ const Navbar = memo(() => {
     document.documentElement.classList.toggle('dark', dark)
     localStorage.setItem('theme', dark ? 'dark' : 'light')
   }, [dark])
+  const location = useLocation()
+  const path = location.pathname
 
   return (
     <nav className="navbar">
@@ -74,10 +78,11 @@ const Navbar = memo(() => {
           GC
         </div>
         <div className="nav-links">
-          <Link to="/" className="nav-link">Home</Link>
-          <Link to="/about" className="nav-link">About</Link>
-          <Link to="/projects" className="nav-link">Projects</Link>
-          <Link to="/articles" className="nav-link">Articles</Link>
+          <Link to="/" className={`nav-link ${path === '/' ? 'active' : ''}`}>Home</Link>
+          <Link to="/about" className={`nav-link ${path === '/about' ? 'active' : ''}`}>About</Link>
+          <Link to="/projects" className={`nav-link ${path === '/projects' ? 'active' : ''}`}>Projects</Link>
+          <Link to="/articles" className={`nav-link ${path === '/articles' ? 'active' : ''}`}>Articles</Link>
+          <Link to="/workspace" className={`nav-link ${path === '/workspace' ? 'active' : ''}`}>Workspace</Link>
         </div>
         <div className="nav-actions">
           <button
@@ -122,13 +127,16 @@ Decisões Técnicas:
 export default function App() {
   return (
     <div className="app-container">
+      <InteractiveBackground />
       <Navbar />
       
       <Routes>
         <Route path="/" element={<Home />} />
         <Route path="/about" element={<AboutPage />} />
         <Route path="/articles" element={<ArticlesPage />} />
+        <Route path="/articles/:slug" element={<ArticleDetail />} />
         <Route path="/projects" element={<ProjectsPage />} />
+        <Route path="/workspace" element={<WorkspacePage />} />
       </Routes>
 
       {/* ── Footer ── */}
@@ -287,7 +295,8 @@ const Home = memo(() => {
             </div>
             
             <div className="workspace-bg-decoration" aria-hidden="true">
-              <svg width="117" height="94" viewBox="0 0 117 94" fill="none" xmlns="http://www.w3.org/2000/svg">
+              <svg width="117" height="94" viewBox="0 0 117 94" fill="none" 
+              xmlns="http://www.w3.org/2000/svg">
                 <path d="M35 25L15 47L35 69" stroke="#0F172A" strokeWidth="8" strokeLinecap="round" strokeLinejoin="round"/>
                 <path d="M82 25L102 47L82 69" stroke="#0F172A" strokeWidth="8" strokeLinecap="round" strokeLinejoin="round"/>
                 <path d="M65 15L52 79" stroke="#0F172A" strokeWidth="8" strokeLinecap="round" strokeLinejoin="round"/>
@@ -403,12 +412,12 @@ const Home = memo(() => {
           <p className="cta-sub">{I18N.CTA.SUBTITLE}</p>
           <div className="cta-btns">
             <button className="btn btn-dark btn-lg">
+              <MessageCircle size={16} aria-hidden="true" style={{ marginLeft: 8 }} />
               {I18N.CTA.PRIMARY}
-              <MessageSquare size={16} aria-hidden="true" style={{ marginLeft: 8 }} />
             </button>
             <button className="btn btn-outline btn-lg" onClick={copyEmail}>
-              {I18N.CTA.SECONDARY}
               <Mail size={16} aria-hidden="true" style={{ marginLeft: 8 }} />
+              {I18N.CTA.SECONDARY}
             </button>
           </div>
         </div>
